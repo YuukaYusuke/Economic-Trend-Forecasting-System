@@ -1,0 +1,39 @@
+# Rahasia & konfigurasi lokal
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# IDE & OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Streamlit / log sementara
+.streamlit/cache/
+
+# Model (uncomment jika pakai Git LFS atau upload terpisah)
+# models/*.keras
+# models/*_meta.pkl
+
+# Data runtime (log bisa berubah di server)
+data/predictions_log.csv
+
+# Skrip generator sementara
+scripts/_gen_log.txt

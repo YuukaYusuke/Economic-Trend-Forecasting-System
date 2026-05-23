@@ -1,0 +1,15 @@
+{
+  "jv": { "name": "ꦧꦱꦗꦮ", "short": "JV", "rtl": false },
+  "id": { "name": "Bahasa Indonesia", "short": "ID", "rtl": false },
+  "en": { "name": "English", "short": "EN", "rtl": false },
+  "ar": { "name": "العربية", "short": "AR", "rtl": true },
+  "ja": { "name": "日本語", "short": "JA", "rtl": false },
+  "zh": { "name": "中文", "short": "ZH", "rtl": false },
+  "ko": { "name": "한국어", "short": "KO", "rtl": false },
+  "ms": { "name": "Bahasa Melayu", "short": "MS", "rtl": false },
+  "es": { "name": "Español", "short": "ES", "rtl": false },
+  "fr": { "name": "Français", "short": "FR", "rtl": false },
+  "de": { "name": "Deutsch", "short": "DE", "rtl": false },
+  "pt": { "name": "Português", "short": "PT", "rtl": false },
+  "th": { "name": "ไทย", "short": "TH", "rtl": false }
+}
