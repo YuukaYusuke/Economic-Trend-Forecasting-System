@@ -29,3 +29,14 @@ def get_selectable_currencies():
         items.append({"iso": iso, "name": name, "column": column})
 
     return sorted(items, key=lambda x: x["name"])
+
+
+@st.cache_data(ttl=3600)
+def get_dataset_currencies():
+    """Mata uang yang punya kolom di dataset (tanpa syarat API live)."""
+    cols = get_dataset_columns()
+    items = []
+    for column, (iso, name) in CURRENCY_COLUMNS.items():
+        if column in cols:
+            items.append({"iso": iso, "name": name, "column": column})
+    return sorted(items, key=lambda x: x["name"])

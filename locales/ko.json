@@ -153,7 +153,7 @@
       "note": "모델이 디스크에 저장됩니다. <strong>UP</strong> 예측 &gt; 실시간 요금; <strong>DOWN</strong> 그렇지 않으면.",
       "no_api": "실시간 요금을 이용할 수 없습니다. 연결 또는 API 제한을 확인하세요.",
       "result": "결과",
-      "result_ok": "USD/{iso} ({name}): <strong>{dir}</strong> · 격차 {pct:.2f}%",
+      "result_ok": "USD/{iso} ({name}): {dir} · 격차 {pct:.2f}%",
       "chart": "예측 차트",
       "export": "보고서 내보내기",
       "pdf_err": "PDF 내보내기를 위해 reportlab를 설치하세요."

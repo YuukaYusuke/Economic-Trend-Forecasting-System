@@ -153,7 +153,7 @@
       "note": "Le modèle est enregistré sur le disque. <strong>UP</strong> si prévision &gt; taux en direct ; <strong>DOWN</strong> sinon.",
       "no_api": "Tarif en direct indisponible. Vérifiez les limites de connexion ou d'API.",
       "result": "Résultats",
-      "result_ok": "USD/{iso} ({name}) : <strong>{dir}</strong> · écart {pct:.2f}%",
+      "result_ok": "USD/{iso} ({name}) : {dir} · écart {pct:.2f}%",
       "chart": "Graphique de prévision",
       "export": "Exporter le rapport",
       "pdf_err": "Installez reportlab pour l'exportation PDF."

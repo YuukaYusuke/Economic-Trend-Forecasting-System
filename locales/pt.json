@@ -153,7 +153,7 @@
       "note": "O modelo é salvo no disco. <strong>UP</strong> se previsão &gt; taxa ao vivo; <strong>DOWN</strong> caso contrário.",
       "no_api": "Taxa ao vivo indisponível. Verifique os limites de conexão ou API.",
       "result": "Resultados",
-      "result_ok": "USD/{iso} ({name}): <strong>{dir}</strong> · lacuna {pct:.2f}%",
+      "result_ok": "USD/{iso} ({name}): {dir} · lacuna {pct:.2f}%",
       "chart": "Gráfico de previsão",
       "export": "Exportar relatório",
       "pdf_err": "Instale reportlab para exportação PDF."

@@ -153,7 +153,7 @@
       "note": "El modelo se guarda en el disco. <strong>UP</strong> si pronóstico &gt; tarifa en vivo; <strong>DOWN</strong> en caso contrario.",
       "no_api": "Tarifa en vivo no disponible. Verifique los límites de conexión o API.",
       "result": "Resultados",
-      "result_ok": "USD/{iso} ({name}): <strong>{dir}</strong> · brecha {pct:.2f}%",
+      "result_ok": "USD/{iso} ({name}): {dir} · brecha {pct:.2f}%",
       "chart": "Gráfico de pronóstico",
       "export": "Informe de exportación",
       "pdf_err": "Instale reportlab para exportar PDF."

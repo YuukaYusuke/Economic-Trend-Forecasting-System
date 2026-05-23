@@ -153,7 +153,7 @@
       "note": "モデルはディスクに保存されます。 <strong>UP</strong> 予報の場合 >生存率。それ以外の場合は、<strong>DOWN</strong>。",
       "no_api": "ライブレートは利用できません。接続または API の制限を確認してください。",
       "result": "結果",
-      "result_ok": "USD/{iso} ({name}): <strong>{dir}</strong> · ギャップ {pct:.2f}%",
+      "result_ok": "USD/{iso} ({name}): {dir} · ギャップ {pct:.2f}%",
       "chart": "予測チャート",
       "export": "レポートのエクスポート",
       "pdf_err": "PDF エクスポート用に reportlab をインストールします。"

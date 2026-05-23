@@ -153,7 +153,7 @@
       "note": "Model disimpan pada cakera. <strong>UP</strong> jika ramalan &gt; kadar hidup; <strong>TURUN</strong> sebaliknya.",
       "no_api": "Kadar langsung tidak tersedia. Semak sambungan atau had API.",
       "result": "Keputusan",
-      "result_ok": "USD/{iso} ({name}): <strong>{dir}</strong> · jurang {pct:.2f}%",
+      "result_ok": "USD/{iso} ({name}): {dir} · jurang {pct:.2f}%",
       "chart": "Carta ramalan",
       "export": "Laporan eksport",
       "pdf_err": "Pasang reportlab untuk PDF eksport."

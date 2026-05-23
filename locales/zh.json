@@ -153,7 +153,7 @@
       "note": "模型保存在磁盘上。 <strong>UP</strong> 如果预测>实时率；否则<strong>DOWN</strong>。",
       "no_api": "实时汇率不可用。检查连接或 API 限制。",
       "result": "结果",
-      "result_ok": "USD/{iso} ({name}): <strong>{dir}</strong>·差距{pct:.2f}%",
+      "result_ok": "USD/{iso} ({name}): {dir} · 差距 {pct:.2f}%",
       "chart": "预测图",
       "export": "出口报告",
       "pdf_err": "安装reportlab以进行PDF导出。"

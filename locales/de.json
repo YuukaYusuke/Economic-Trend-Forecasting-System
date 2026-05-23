@@ -153,7 +153,7 @@
       "note": "Das Modell wird auf der Festplatte gespeichert. <strong>UP</strong> wenn Prognose &gt; Live-Rate; <strong>DOWN</strong> andernfalls.",
       "no_api": "Live-Tarif nicht verfügbar. Überprüfen Sie die Verbindungs- oder API-Grenzwerte.",
       "result": "Ergebnisse",
-      "result_ok": "USD/{iso} ({name}): <strong>{dir}</strong> · Lücke {pct:.2f}%",
+      "result_ok": "USD/{iso} ({name}): {dir} · Lücke {pct:.2f}%",
       "chart": "Prognosediagramm",
       "export": "Bericht exportieren",
       "pdf_err": "Installieren Sie reportlab für den PDF-Export."

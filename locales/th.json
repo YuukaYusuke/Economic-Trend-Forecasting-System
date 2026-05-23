@@ -153,7 +153,7 @@
       "note": "โมเดลถูกบันทึกไว้ในดิสก์ <strong>UP</strong> หากพยากรณ์ &gt; อัตราสด; <strong>ลง</strong> มิฉะนั้น",
       "no_api": "อัตราสดไม่พร้อมใช้งาน ตรวจสอบการเชื่อมต่อหรือขีดจำกัด API",
       "result": "ผลลัพธ์",
-      "result_ok": "USD/{iso} ({name}): <strong>{dir}</strong> · ช่องว่าง {pct:.2f}%",
+      "result_ok": "USD/{iso} ({name}): {dir} · ช่องว่าง {pct:.2f}%",
       "chart": "แผนภูมิพยากรณ์",
       "export": "รายงานการส่งออก",
       "pdf_err": "ติดตั้ง reportlab เพื่อส่งออก PDF"

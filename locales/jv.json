@@ -154,7 +154,7 @@
       "note": "ꦩꦺꦢꦼꦭ꧀ꦏꦉꦶꦩꦸꦤ꧀. <strong>NAIK</strong> ꦪꦤ꧀ꦥꦿꦔꦸꦭꦤ꧀ &gt; ꦔꦸꦫꦱ꧀ live; <strong>TURUN</strong> ꦪꦤ꧀ꦱꦼꦧꦭꦶꦏꦺ.",
       "no_api": "ꦔꦸꦫꦱ꧀ realtime ꦲꦺꦴꦫꦏꦱꦺꦢꦶꦪ. ꦥꦿꦶꦏ꧀ꦱꦱꦩꦧꦸꦤ꧀ꦲꦸꦠꦲꦮ watesan API.",
       "result": "ꦲꦱꦶꦭ꧀ꦥꦿꦔꦸꦭꦤ꧀",
-      "result_ok": "USD/{iso} ({name}): ꦲꦫꦃ꧀ <strong>{dir}</strong> · ꦱꦼꦭꦶꦱꦶꦃ {pct:.2f}%",
+      "result_ok": "USD/{iso} ({name}): ꦲꦫꦃ꧀ {dir} · ꦱꦼꦭꦶꦱꦶꦃ {pct:.2f}%",
       "chart": "ꦒꦿꦥꦶꦏ꧀ꦥꦿꦔꦸꦭꦤ꧀",
       "export": "꦳ꦸꦤ꧀ꦢꦸꦃꦭꦥꦺꦴꦫꦤ꧀",
       "pdf_err": "ꦲꦶꦤ꧀ꦱꦠꦭ꧀ꦥꦏꦺ꧀ reportlab ꦏꦁꦒꦺꦴꦌꦏ꧀ꦱꦺꦴꦂ PDF."

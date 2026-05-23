@@ -15,29 +15,55 @@ CHART = {
 }
 
 CHART_HEIGHT = 440
-CHART_MARGIN = dict(l=48, r=32, t=72, b=48)
+CHART_MARGIN = dict(l=56, r=28, t=52, b=88)
+
+CHART_LEGEND = dict(
+    orientation="h",
+    yanchor="top",
+    y=-0.22,
+    xanchor="center",
+    x=0.5,
+    bgcolor="rgba(255,255,255,0.9)",
+    bordercolor=CHART["grid"],
+    borderwidth=1,
+    font=dict(size=11),
+    tracegroupgap=12,
+)
 
 
-def apply_layout(fig, title: str, y_title: str = "Nilai", height: int = CHART_HEIGHT):
-    fig.update_layout(
-        title=dict(text=title, font=dict(size=17, color=CHART["text"], family="DM Sans")),
+def apply_layout(
+    fig,
+    title: str,
+    y_title: str = "Nilai",
+    height: int = CHART_HEIGHT,
+    *,
+    show_legend: bool = True,
+    bottom_margin: int | None = None,
+):
+    margin = dict(CHART_MARGIN)
+    if bottom_margin is not None:
+        margin["b"] = bottom_margin
+    layout = dict(
+        title=dict(
+            text=title,
+            font=dict(size=16, color=CHART["text"], family="DM Sans"),
+            x=0.02,
+            xanchor="left",
+            y=0.98,
+            yanchor="top",
+        ),
         font=dict(family="DM Sans, sans-serif", color=CHART["text"], size=12),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor=CHART["bg"],
         hovermode="x unified",
         height=height,
-        margin=CHART_MARGIN,
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1,
-            bgcolor="rgba(255,255,255,0.8)",
-            bordercolor=CHART["grid"],
-            borderwidth=1,
-        ),
+        margin=margin,
     )
+    if show_legend:
+        layout["legend"] = dict(CHART_LEGEND)
+    else:
+        layout["showlegend"] = False
+    fig.update_layout(**layout)
     fig.update_xaxes(
         showgrid=True,
         gridwidth=1,

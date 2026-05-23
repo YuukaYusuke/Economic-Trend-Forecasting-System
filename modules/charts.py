@@ -2,8 +2,107 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from modules.chart_theme import CHART, CHART_HEIGHT, apply_layout
-from modules.i18n import t
+from modules.chart_theme import CHART, CHART_HEIGHT, CHART_LEGEND, apply_layout
+from modules.i18n import format_direction, t
+
+
+_DATASET_SERIES_COLORS = (
+    CHART["primary"],
+    CHART["secondary"],
+    CHART["up"],
+    CHART["down"],
+    CHART["warn"],
+    "#8b5cf6",
+    "#ec4899",
+    "#0ea5e9",
+)
+
+
+def _hline(fig, y, color, dash="dash", width=1.5):
+    fig.add_hline(y=y, line_dash=dash, line_color=color, line_width=width)
+
+
+def _last_point(fig, df: pd.DataFrame, color):
+    if df.empty:
+        return
+    fig.add_trace(
+        go.Scatter(
+            x=[df["date"].iloc[-1]],
+            y=[df["rate"].iloc[-1]],
+            mode="markers",
+            name=t("chart_last_point"),
+            marker=dict(size=9, color=color, line=dict(width=2, color="white")),
+            hovertemplate=f"{t('chart_last_marker')}: %{{y:,.6f}}<extra></extra>",
+            showlegend=False,
+        )
+    )
+
+
+def _dataset_preview_single(df: pd.DataFrame, iso: str, name: str):
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=df["date"],
+            y=df["rate"],
+            mode="lines",
+            name=f"{iso} — {name}",
+            line=dict(color=CHART["primary"], width=2.5),
+            fill="tozeroy",
+            fillcolor=CHART["primary_soft"],
+        )
+    )
+    if len(df):
+        avg = df["rate"].mean()
+        _hline(fig, avg, CHART["warn"])
+        fig.add_trace(
+            go.Scatter(
+                x=[None],
+                y=[None],
+                mode="lines",
+                name=t("chart_avg_period", avg=avg),
+                line=dict(color=CHART["warn"], dash="dash", width=1.5),
+            )
+        )
+        _last_point(fig, df, CHART["down"])
+    return apply_layout(
+        fig,
+        f"{iso} — {name}",
+        y_title=t("chart_y_raw_rate", iso=iso),
+        bottom_margin=96,
+    )
+
+
+def dataset_preview_chart(series_list: list[tuple[pd.DataFrame, str, str]]):
+    """series_list: [(df date+rate, iso, name), ...]. Multi → indeks basis 100."""
+    if not series_list:
+        return apply_layout(go.Figure(), t("no_data"), y_title="")
+    if len(series_list) == 1:
+        df, iso, name = series_list[0]
+        return _dataset_preview_single(df, iso, name)
+
+    fig = go.Figure()
+    for i, (df, iso, name) in enumerate(series_list):
+        if df.empty:
+            continue
+        base = df["rate"].iloc[0]
+        if not base:
+            continue
+        color = _DATASET_SERIES_COLORS[i % len(_DATASET_SERIES_COLORS)]
+        fig.add_trace(
+            go.Scatter(
+                x=df["date"],
+                y=df["rate"] / base * 100,
+                mode="lines",
+                name=f"{iso} — {name}",
+                line=dict(color=color, width=2.5),
+            )
+        )
+    return apply_layout(
+        fig,
+        t("chart_dataset_multi_title"),
+        y_title=t("chart_index_axis"),
+        bottom_margin=104,
+    )
 
 
 def history_chart(df: pd.DataFrame, iso: str, name: str):
@@ -23,29 +122,22 @@ def history_chart(df: pd.DataFrame, iso: str, name: str):
             fillcolor=CHART["primary_soft"],
         )
     )
-    fig.add_hline(
-        y=avg_5y,
-        line_dash="dash",
-        line_color=CHART["warn"],
-        line_width=2,
-        annotation_text=t("chart_avg_5y", avg=avg_5y),
-        annotation_font_color=CHART["text_soft"],
-    )
+    _hline(fig, avg_5y, CHART["warn"])
     fig.add_trace(
         go.Scatter(
-            x=[df["date"].iloc[-1]],
-            y=[df["rate"].iloc[-1]],
-            mode="markers+text",
-            text=[t("chart_last_marker")],
-            textposition="top center",
-            name=t("chart_last_point"),
-            marker=dict(size=11, color=CHART["down"], line=dict(width=2, color="white")),
+            x=[None],
+            y=[None],
+            mode="lines",
+            name=t("chart_avg_5y", avg=avg_5y),
+            line=dict(color=CHART["warn"], dash="dash", width=1.5),
         )
     )
+    _last_point(fig, df, CHART["down"])
     return apply_layout(
         fig,
         f"USD/{iso} — {name}",
         y_title=t("chart_y_rate"),
+        bottom_margin=96,
     )
 
 
@@ -73,24 +165,31 @@ def prediction_chart(df_tail: pd.DataFrame, iso: str, live: float, pred: float, 
             marker=dict(size=10, color=[CHART["up"], CHART["warn"]]),
         )
     )
-    fig.add_hline(
-        y=live,
-        line_dash="dash",
-        line_color=CHART["up"],
-        line_width=2,
-        annotation_text=t("chart_live_ann", val=live),
+    _hline(fig, live, CHART["up"])
+    _hline(fig, pred, CHART["warn"], dash="dot")
+    fig.add_trace(
+        go.Scatter(
+            x=[None],
+            y=[None],
+            mode="lines",
+            name=t("chart_live_ann", val=live),
+            line=dict(color=CHART["up"], dash="dash", width=1.5),
+        )
     )
-    fig.add_hline(
-        y=pred,
-        line_dash="dot",
-        line_color=CHART["warn"],
-        line_width=2,
-        annotation_text=t("chart_pred_ann", val=pred, dir=arah),
+    fig.add_trace(
+        go.Scatter(
+            x=[None],
+            y=[None],
+            mode="lines",
+            name=t("chart_pred_ann", val=pred, dir=arah),
+            line=dict(color=CHART["warn"], dash="dot", width=1.5),
+        )
     )
     return apply_layout(
         fig,
-        t("chart_pred_title", iso=iso, dir=arah),
+        t("chart_pred_title", iso=iso, dir=format_direction(arah)),
         y_title=t("chart_y_rate"),
+        bottom_margin=104,
     )
 
 
@@ -99,7 +198,7 @@ def evaluation_chart(actual, predicted, iso: str, name: str):
         rows=1,
         cols=2,
         subplot_titles=(t("chart_eval_subplot1"), t("chart_eval_subplot2")),
-        horizontal_spacing=0.1,
+        horizontal_spacing=0.14,
     )
     fig.add_trace(
         go.Scatter(
@@ -150,8 +249,8 @@ def evaluation_chart(actual, predicted, iso: str, name: str):
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor=CHART["bg"],
         height=CHART_HEIGHT,
-        margin=dict(l=48, r=32, t=80, b=48),
-        legend=dict(orientation="h", y=1.12),
+        margin=dict(l=56, r=28, t=64, b=88),
+        legend=dict(CHART_LEGEND),
     )
     fig.update_xaxes(gridcolor=CHART["grid"], row=1, col=2, title_text=t("chart_actual"))
     fig.update_yaxes(gridcolor=CHART["grid"], row=1, col=1, title_text=t("chart_value_axis"))
@@ -219,8 +318,8 @@ def evaluation_with_baseline(actual, lstm_pred, ma_pred, iso: str):
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor=CHART["bg"],
         height=CHART_HEIGHT,
-        margin=dict(l=48, r=32, t=72, b=48),
-        legend=dict(orientation="h", y=1.08),
+        margin=dict(l=56, r=28, t=64, b=88),
+        legend=dict(CHART_LEGEND),
     )
     fig.update_xaxes(gridcolor=CHART["grid"], row=1, col=2, title_text=t("chart_ma_axis"))
     fig.update_yaxes(gridcolor=CHART["grid"], row=1, col=2, title_text=t("chart_lstm_axis"))
@@ -251,6 +350,7 @@ def dual_currency_chart(df1, df2, iso1, iso2, name1, name2):
         fig,
         t("chart_index_title", iso1=iso1, iso2=iso2),
         y_title=t("chart_index_axis"),
+        bottom_margin=96,
     )
 
 
