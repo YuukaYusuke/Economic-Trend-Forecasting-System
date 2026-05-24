@@ -141,7 +141,7 @@ def history_chart(df: pd.DataFrame, iso: str, name: str):
     )
 
 
-def prediction_chart(df_tail: pd.DataFrame, iso: str, live: float, pred: float, arah: str):
+def prediction_chart(df_tail: pd.DataFrame, iso: str, live: float, pred: float, arah: str, lower=None, upper=None):
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
@@ -165,6 +165,18 @@ def prediction_chart(df_tail: pd.DataFrame, iso: str, live: float, pred: float, 
             marker=dict(size=10, color=[CHART["up"], CHART["warn"]]),
         )
     )
+    if lower is not None and upper is not None:
+        fig.add_trace(
+            go.Scatter(
+                x=[last_d, last_d],
+                y=[lower, upper],
+                mode="lines+markers",
+                name="Prediction range",
+                line=dict(color=CHART["muted"], width=5),
+                marker=dict(size=7, color=CHART["muted"]),
+                hovertemplate="Range: %{y:,.4f}<extra></extra>",
+            )
+        )
     _hline(fig, live, CHART["up"])
     _hline(fig, pred, CHART["warn"], dash="dot")
     fig.add_trace(

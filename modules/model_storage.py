@@ -3,6 +3,8 @@ from pathlib import Path
 
 from modules.config import MODELS_DIR, TRAIN_EPOCHS, WINDOW
 
+MODEL_VERSION = "return_features_v2"
+
 
 def _paths(currency_column: str):
     base = Path(MODELS_DIR)
@@ -14,14 +16,18 @@ def _paths(currency_column: str):
     )
 
 
-def save_model_artifacts(model, scaler, currency_column: str, epochs: int = TRAIN_EPOCHS):
+def save_model_artifacts(model, artifacts: dict, currency_column: str, epochs: int = TRAIN_EPOCHS):
     model_path, meta_path = _paths(currency_column)
     model.save(model_path)
+    payload = {
+        **artifacts,
+        "version": MODEL_VERSION,
+        "epochs": epochs,
+        "window": WINDOW,
+        "column": currency_column,
+    }
     with open(meta_path, "wb") as f:
-        pickle.dump(
-            {"scaler": scaler, "epochs": epochs, "window": WINDOW, "column": currency_column},
-            f,
-        )
+        pickle.dump(payload, f)
 
 
 def load_model_artifacts(currency_column: str, epochs: int = TRAIN_EPOCHS):
@@ -34,8 +40,12 @@ def load_model_artifacts(currency_column: str, epochs: int = TRAIN_EPOCHS):
     with open(meta_path, "rb") as f:
         meta = pickle.load(f)
 
-    if meta.get("epochs") != epochs or meta.get("window") != WINDOW:
+    if (
+        meta.get("version") != MODEL_VERSION
+        or meta.get("epochs") != epochs
+        or meta.get("window") != WINDOW
+    ):
         return None
 
-    model = load_model(model_path)
-    return model, meta["scaler"]
+    model = load_model(model_path, compile=False)
+    return model, meta

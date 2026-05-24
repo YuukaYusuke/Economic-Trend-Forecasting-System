@@ -5,7 +5,7 @@ from modules.currency_registry import CURRENCY_COLUMNS
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = str(PROJECT_ROOT / "data" / "dataset.csv")
 MODELS_DIR = str(PROJECT_ROOT / "models")
-WINDOW = 30
+WINDOW = 60
 TRAIN_RATIO = 0.8
 TRAIN_EPOCHS = 25
 BATCH_SIZE = 32

@@ -16,6 +16,7 @@
     "trend": "Tren",
     "insight": "Wawasan",
     "realtime": "Kurs Langsung",
+    "world_map": "Peta Dunia",
     "bandingkan": "Bandingkan",
     "simulasi": "Simulasi"
   },
@@ -209,6 +210,10 @@
       "table": "Tabel lengkap",
       "filter_trend": "Filter trend",
       "filter_ds": "Filter dataset"
+    },
+    "world_map": {
+      "title": "Peta Dunia Prediksi Kurs",
+      "subtitle": "Choropleth global berdasarkan predicted return, lengkap dengan hover tooltip dan panel detail."
     },
     "bandingkan": {
       "title": "Bandingkan Mata Uang",
