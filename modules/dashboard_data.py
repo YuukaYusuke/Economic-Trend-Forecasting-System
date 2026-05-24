@@ -30,6 +30,9 @@ def executive_summary(fav_iso: str = "IDR"):
                     "arah": r["prediksi_arah"],
                     "live": live,
                     "pred": r["next_value"],
+                    "raw_pred": r.get("raw_next_value"),
+                    "change_pct": (r.get("calibration") or {}).get("return_pct"),
+                    "cap_pct": (r.get("calibration") or {}).get("cap_pct"),
                 }
             except Exception:
                 pass

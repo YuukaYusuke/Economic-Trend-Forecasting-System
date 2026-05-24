@@ -14,7 +14,7 @@ setup_page("insight")
 iso, column, name = currency_selector()
 live = get_live_rate("USD", iso)
 r = get_predictions(column, live_rate=live, iso=iso, name=name)
-err = mape(r["actual"], r["predicted"])
+err = mape(r["actual"], r["predicted_calibrated"])
 
 if r["uses_live"]:
     conf = r.get("confidence") or {}

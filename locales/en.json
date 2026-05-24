@@ -16,6 +16,7 @@
     "trend": "Trend",
     "insight": "Insight",
     "realtime": "Live Rates",
+    "world_map": "World Map",
     "bandingkan": "Compare",
     "simulasi": "Simulation"
   },
@@ -209,6 +210,10 @@
       "table": "Full table",
       "filter_trend": "Trend filter",
       "filter_ds": "Dataset filter"
+    },
+    "world_map": {
+      "title": "FX Forecast World Map",
+      "subtitle": "Global choropleth based on predicted return, with hover tooltips and a focused detail panel."
     },
     "bandingkan": {
       "title": "Compare Currencies",

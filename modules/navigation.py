@@ -17,6 +17,7 @@ def build_navigation():
             st.Page("pages/7_Trend.py", title=tn("trend"), icon="📈"),
             st.Page("pages/8_Insight.py", title=tn("insight"), icon="💡"),
             st.Page("pages/9_Realtime.py", title=tn("realtime"), icon="🌐"),
+            st.Page("pages/10_World_Map.py", title=tn("world_map"), icon="🗺️"),
             st.Page("pages/11_Bandingkan.py", title=tn("bandingkan"), icon="⚖️"),
             st.Page("pages/12_Simulasi.py", title=tn("simulasi"), icon="🧪"),
         ]
