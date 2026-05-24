@@ -16,6 +16,7 @@ FEATURE_COLUMNS = [
     "lag_2",
     "lag_5",
     "lag_10",
+    "market_stress_index",  # Macroeconomic feature (VIX-like)
 ]
 
 
@@ -49,6 +50,31 @@ def _rsi(series: pd.Series, period: int = 14) -> pd.Series:
     return rsi.fillna(50).clip(0, 100)
 
 
+def _market_stress_index(returns: pd.Series, window: int = 20) -> pd.Series:
+    """
+    Compute a VIX-like market stress index based on:
+    - Volatility clustering (squared returns)
+    - Skewness of returns (tail risk)
+    
+    This serves as a macroeconomic feature indicating overall market stress.
+    """
+    vol = returns.rolling(window).std()
+    # Squared returns to capture volatility clustering
+    squared_returns = (returns ** 2).rolling(window).mean()
+    # Simple skewness approximation: mean of cubic returns
+    skew_proxy = (returns ** 3).rolling(window).mean()
+    
+    # Combine: stress = volatility + squared_returns + |skewness|
+    stress = (vol * 0.5) + (squared_returns * 10) + (skew_proxy.abs() * 5)
+    
+    # Normalize to 0-1 range per rolling window
+    stress_min = stress.rolling(window).min()
+    stress_max = stress.rolling(window).max()
+    stress_normalized = (stress - stress_min) / (stress_max - stress_min + 1e-8)
+    
+    return stress_normalized.fillna(0.5).clip(0, 1)
+
+
 def engineer_features(df: pd.DataFrame, include_target: bool = True) -> pd.DataFrame:
     out = df.copy()
     out["return_1"] = out["rate"].pct_change()
@@ -59,6 +85,8 @@ def engineer_features(df: pd.DataFrame, include_target: bool = True) -> pd.DataF
     out["volatility_20"] = out["return_1"].rolling(20).std()
     out["momentum_10"] = out["rate"] - out["rate"].shift(10)
     out["rsi"] = _rsi(out["rate"])
+    out["market_stress_index"] = _market_stress_index(out["return_1"], window=20)
+    
     for lag in (1, 2, 5, 10):
         out[f"lag_{lag}"] = out["rate"].shift(lag)
 
