@@ -1,5 +1,11 @@
+"""
+World Map Module - MERGED VERSION
+Original functions + Phase 2 caching optimization
+"""
+
 from __future__ import annotations
 
+import logging
 import math
 from datetime import timedelta
 
@@ -12,6 +18,11 @@ from modules.chart_theme import CHART, apply_layout
 from modules.currencies import get_selectable_currencies
 from modules.pipeline_service import get_predictions
 
+logger = logging.getLogger(__name__)
+
+# ============================================================================
+# CURRENCY COUNTRY MAPPING
+# ============================================================================
 
 CURRENCY_COUNTRIES: dict[str, list[tuple[str, str]]] = {
     "AED": [("ARE", "United Arab Emirates")],
@@ -79,7 +90,12 @@ CURRENCY_COUNTRIES: dict[str, list[tuple[str, str]]] = {
 }
 
 
+# ============================================================================
+# HELPER FUNCTIONS (Original)
+# ============================================================================
+
 def _rsi(values: pd.Series, period: int = 14) -> float:
+    """Calculate RSI (Relative Strength Index)."""
     delta = values.diff().dropna()
     if len(delta) < period:
         return float("nan")
@@ -92,6 +108,7 @@ def _rsi(values: pd.Series, period: int = 14) -> float:
 
 
 def _volatility(values: pd.Series, window: int = 30) -> float:
+    """Calculate volatility (standard deviation of returns)."""
     returns = values.pct_change().dropna().tail(window)
     if returns.empty:
         return float("nan")
@@ -99,6 +116,7 @@ def _volatility(values: pd.Series, window: int = 30) -> float:
 
 
 def _confidence_level(abs_return_pct: float, volatility_pct: float) -> str:
+    """Determine confidence level based on return and volatility."""
     if math.isnan(volatility_pct):
         volatility_pct = 0.0
     score = abs_return_pct / max(volatility_pct, 0.05)
@@ -110,6 +128,7 @@ def _confidence_level(abs_return_pct: float, volatility_pct: float) -> str:
 
 
 def _volatility_label(volatility_pct: float) -> str:
+    """Convert volatility percentage to label."""
     if math.isnan(volatility_pct):
         return "Unknown"
     if volatility_pct >= 1.0:
@@ -120,7 +139,14 @@ def _volatility_label(volatility_pct: float) -> str:
 
 
 def _insight(return_pct: float, volatility_pct: float) -> str:
-    direction = "kenaikan" if return_pct > 0 else "penurunan" if return_pct < 0 else "pergerakan datar"
+    """Generate insight text for prediction."""
+    direction = (
+        "kenaikan"
+        if return_pct > 0
+        else "penurunan"
+        if return_pct < 0
+        else "pergerakan datar"
+    )
     strength = "moderat" if abs(return_pct) >= 0.12 else "ringan"
     vol = _volatility_label(volatility_pct).lower()
     if direction == "pergerakan datar":
@@ -128,8 +154,29 @@ def _insight(return_pct: float, volatility_pct: float) -> str:
     return f"Prediksi menunjukkan {direction} {strength} dengan volatilitas {vol}."
 
 
+# ============================================================================
+# MAIN FUNCTIONS (Original with Phase 2 caching)
+# ============================================================================
+
 @st.cache_data(ttl=300, show_spinner=False)
-def build_world_map_forecasts(live_rates: dict[str, float], timeframe: str = "1D") -> pd.DataFrame:
+def build_world_map_forecasts(
+    live_rates: dict[str, float], 
+    timeframe: str = "1D"
+) -> pd.DataFrame:
+    """
+    Build forecasts for world map.
+    
+    Cached with 5-minute TTL for live data updates.
+    
+    Args:
+        live_rates: Dict of {currency: rate}
+        timeframe: Time period ('1D', '7D', '30D')
+    
+    Returns:
+        DataFrame with predictions for all currencies
+    """
+    logger.info(f"Building world map forecasts (cached 5min, timeframe={timeframe})")
+    
     rows = []
     currencies = get_selectable_currencies()
 
@@ -140,8 +187,13 @@ def build_world_map_forecasts(live_rates: dict[str, float], timeframe: str = "1D
             continue
 
         try:
-            result = get_predictions(item["column"], live_rate=live, timeframe=timeframe)
-        except Exception:
+            result = get_predictions(
+                item["column"], 
+                live_rate=live, 
+                timeframe=timeframe
+            )
+        except Exception as e:
+            logger.warning(f"Could not get prediction for {iso}: {e}")
             continue
 
         df = result["df"]
@@ -151,7 +203,13 @@ def build_world_map_forecasts(live_rates: dict[str, float], timeframe: str = "1D
         raw_pred = result["raw_next_value"]
         rsi = _rsi(df["rate"])
         vol = _volatility(df["rate"])
-        trend = "Bullish" if return_pct > 0 else "Bearish" if return_pct < 0 else "Neutral"
+        trend = (
+            "Bullish"
+            if return_pct > 0
+            else "Bearish"
+            if return_pct < 0
+            else "Neutral"
+        )
         confidence = _confidence_level(abs(return_pct), vol)
 
         for country_code, country in CURRENCY_COUNTRIES[iso]:
@@ -179,10 +237,23 @@ def build_world_map_forecasts(live_rates: dict[str, float], timeframe: str = "1D
                 }
             )
 
+    logger.info(f"Generated {len(rows)} world map forecast rows")
     return pd.DataFrame(rows)
 
 
 def world_choropleth(df: pd.DataFrame, selected_country: str | None = None) -> go.Figure:
+    """
+    Create world choropleth map visualization.
+    
+    Args:
+        df: DataFrame with prediction data
+        selected_country: Country code to highlight (optional)
+    
+    Returns:
+        Plotly figure
+    """
+    logger.info("Creating world choropleth map")
+    
     custom = np.stack(
         [
             df["row_id"],
@@ -272,6 +343,17 @@ def world_choropleth(df: pd.DataFrame, selected_country: str | None = None) -> g
 
 
 def projection_chart(row: pd.Series) -> go.Figure:
+    """
+    Create projection chart for a single currency.
+    
+    Args:
+        row: Series with history and prediction data
+    
+    Returns:
+        Plotly figure
+    """
+    logger.info(f"Creating projection chart for {row['country']}")
+    
     dates = pd.to_datetime(row["history_dates"])
     values = pd.Series(row["history"], dtype=float)
     horizon_days = {"1D": 1, "7D": 7, "30D": 30}.get(row["timeframe"], 1)
@@ -308,6 +390,17 @@ def projection_chart(row: pd.Series) -> go.Figure:
 
 
 def compare_chart(rows: pd.DataFrame) -> go.Figure:
+    """
+    Create comparison chart for multiple currencies.
+    
+    Args:
+        rows: DataFrame with multiple currency data
+    
+    Returns:
+        Plotly figure
+    """
+    logger.info(f"Creating comparison chart for {len(rows)} currencies")
+    
     fig = go.Figure()
     for _, row in rows.iterrows():
         dates = pd.to_datetime(row["history_dates"])
@@ -323,4 +416,9 @@ def compare_chart(rows: pd.DataFrame) -> go.Figure:
                 name=f"{row['country']} ({row['currency']})",
             )
         )
-    return apply_layout(fig, "Compare countries - index base 100", y_title="Index", height=330)
+    return apply_layout(
+        fig, 
+        "Compare countries - index base 100", 
+        y_title="Index", 
+        height=330
+    )

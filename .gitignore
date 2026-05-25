@@ -1,39 +1,84 @@
-# Rahasia & konfigurasi lokal
-.env
-.env.*
-!.env.example
-.streamlit/secrets.toml
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-venv/
-.venv/
-env/
-*.egg-info/
-.eggs/
-dist/
 build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# IDE & OS
-.idea/
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDE
 .vscode/
+.idea/
 *.swp
+*.swo
+*~
+.DS_Store
+
+# Streamlit
+.streamlit/
+.streamlit/secrets.toml
+
+# Models & Data
+models/*.pkl
+models/*.h5
+models/*.keras
+data/*.csv.bak
+data/raw/
+data/processed/
+
+# Logs
+logs/
+logs/app.log
+logs/errors.log
+logs/*.log
+
+# Cache
+.cache/
+*.cache
+.pytest_cache/
+.coverage
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Temporary
+*.tmp
+*.temp
+**/temp/
+**/tmp/
+
+# OS
 .DS_Store
 Thumbs.db
 
-# Streamlit / log sementara
-.streamlit/cache/
+# Testing
+htmlcov/
+.tox/
+.hypothesis/
 
-# Model (uncomment jika pakai Git LFS atau upload terpisah)
-# models/*.keras
-# models/*_meta.pkl
-
-# Data runtime (log bisa berubah di server)
-data/predictions_log.csv
-
-# Skrip generator sementara
-scripts/_gen_log.txt
+# Production secrets
+secrets.json
+credentials.json
+.streamlit/secrets.toml

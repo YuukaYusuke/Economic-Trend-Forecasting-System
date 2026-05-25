@@ -5,8 +5,15 @@ numpy>=1.24,<3
 matplotlib>=3.7,<4
 plotly>=5.18,<6
 scikit-learn>=1.3,<2
-tensorflow-cpu>=2.15,<2.19
+
+# Machine Learning Models
+tensorflow>=2.13,<2.14
+keras>=2.13,<2.14
+xgboost>=2.0,<3
+
+# Hyperparameter Tuning
+optuna>=3.0,<4
+
+# Utilities
 requests>=2.31,<3
 reportlab>=4.0,<5
-xgboost>=2.0,<3
-optuna>=3.0,<4
