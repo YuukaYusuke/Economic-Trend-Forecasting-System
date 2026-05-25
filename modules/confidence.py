@@ -1,8 +1,11 @@
 import numpy as np
+from modules.config import CONFIDENCE_THRESHOLDS
 
 
 def prediction_confidence(predicted: float, reference: float) -> tuple[str, float, str]:
     """
+    Calculate prediction confidence level.
+    
     Returns: (level_id: strong|medium|weak, pct_diff, label_id)
     pct_diff = abs(predicted - reference) / reference * 100
     """
@@ -10,9 +13,9 @@ def prediction_confidence(predicted: float, reference: float) -> tuple[str, floa
         return "weak", 0.0, "weak"
 
     pct = abs(predicted - reference) / abs(reference) * 100
-    if pct >= 1.5:
+    if pct >= CONFIDENCE_THRESHOLDS["strong"]:
         level = "strong"
-    elif pct >= 0.4:
+    elif pct >= CONFIDENCE_THRESHOLDS["medium"]:
         level = "medium"
     else:
         level = "weak"

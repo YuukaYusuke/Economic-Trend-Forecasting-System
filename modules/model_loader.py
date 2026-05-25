@@ -18,7 +18,7 @@ class ModelsNotDeployedError(RuntimeError):
     """Model belum ada di disk dan pelatihan runtime dinonaktifkan (mode deploy)."""
 
 
-@st.cache_data(show_spinner=False, ttl=3600)
+@st.cache_data(ttl=3600)
 def get_preprocessed_df(currency_column: str):
     """
     Load and preprocess dataset.

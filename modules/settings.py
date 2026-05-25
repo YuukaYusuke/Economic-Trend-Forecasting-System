@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import logging
 import os
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -23,8 +26,8 @@ def _load_dotenv() -> None:
             value = value.strip().strip('"').strip("'")
             if key and key not in os.environ:
                 os.environ[key] = value
-    except OSError:
-        pass
+    except OSError as e:
+        logger.warning(f"Could not load .env file: {e}")
 
 
 _load_dotenv()
@@ -37,7 +40,8 @@ def _secret_get(key: str) -> str | None:
 
         value = str(st.secrets[key]).strip()
         return value or None
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Could not read secret '{key}': {e}")
         return None
 
 
@@ -53,7 +57,8 @@ def _secret_section(section: str, field: str) -> str | None:
         else:
             value = str(getattr(block, field, "")).strip()
         return value or None
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Could not read secret section '{section}.{field}': {e}")
         return None
 
 
@@ -85,7 +90,8 @@ def allow_runtime_training() -> bool:
                 return bool(app["allow_runtime_training"])
             if hasattr(app, "allow_runtime_training"):
                 return bool(app.allow_runtime_training)
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Could not read runtime training setting: {e}")
         pass
 
     env = os.environ.get("ALLOW_RUNTIME_TRAINING", "").strip().lower()

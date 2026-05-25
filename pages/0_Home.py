@@ -1,3 +1,4 @@
+import logging
 import streamlit as st
 
 from modules.currencies import get_selectable_currencies
@@ -5,6 +6,8 @@ from modules.dashboard_data import executive_summary
 from modules.i18n import format_direction, t, tp
 from modules.page_shell import page_footer, setup_page
 from modules.ui_theme import note, section, stat_card
+
+logger = logging.getLogger(__name__)
 
 setup_page("home")
 
@@ -71,7 +74,8 @@ with p3:
     )
     try:
         st.page_link("pages/10_World_Map.py", label="Buka Peta Dunia")
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Could not create page link: {e}")
         st.caption("Buka lewat sidebar: Peta Dunia")
 
 page_footer()

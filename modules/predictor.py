@@ -11,6 +11,7 @@ from modules.predict import predict_rf_return, predict_xgb_return, ensemble_retu
 from modules.confidence import prediction_confidence
 from modules.prediction_log import append_prediction
 from modules.trend import get_direction
+from modules.validation import validate_numeric, validate_artifacts_dict, validate_prediction_output
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,11 @@ def make_live_prediction(
     """
     logger.info(f"Making live prediction with live_rate={live_rate}")
     
+    # Validate inputs
+    validate_artifacts_dict(_artifacts)
+    if live_rate is not None:
+        live_rate = validate_numeric(live_rate, "live_rate", allow_none=False, allow_zero=False)
+    
     reference = float(live_rate) if live_rate is not None else float(df["rate"].iloc[-1])
     
     # Get latest sequence and features
@@ -49,7 +55,7 @@ def make_live_prediction(
     )
     
     # BiLSTM prediction
-    lstm_scaled = model.predict(sequence, verbose=0)
+    lstm_scaled = model.predict(sequence, verbose=False)
     lstm_return = float(_artifacts["target_scaler"].inverse_transform(lstm_scaled)[0][0])
     
     # RF prediction

@@ -1,48 +1,87 @@
 from __future__ import annotations
 
+import logging
 import math
 
 import numpy as np
 import pandas as pd
 
+from modules.config import (
+    CALIBRATION_MAX_RETURN,
+    CALIBRATION_SMOOTH_WEIGHT,
+    CALIBRATION_TIMEFRAME_SCALE,
+    PREDICTION_BLEND_WEIGHTS,
+    RETURN_SIGNAL_TAIL_DAYS,
+    RETURN_SIGNAL_SHORT_DAYS,
+    RETURN_SIGNAL_EWM_SPAN,
+    DYNAMIC_CAP_MIN_VOL,
+    DYNAMIC_CAP_VOL_MULTIPLIER,
+    DYNAMIC_CAP_VOL_THRESHOLD,
+    DYNAMIC_CAP_AGGRESSIVENESS,
+)
 
-MAX_RETURN = 0.015
-SMOOTH_WEIGHT = 0.2
-TIMEFRAME_SCALE = {"1D": 1.0, "7D": 1.8, "30D": 2.6}
+logger = logging.getLogger(__name__)
 
 
 def pct_change(current: float, reference: float) -> float:
+    """Calculate percentage change between two values."""
     if not reference or math.isnan(reference):
         return 0.0
     return (current - reference) / abs(reference)
 
 
 def recent_return_signal(history, timeframe: str = "1D") -> tuple[float, float]:
+    """Calculate momentum and volatility from historical returns.
+    
+    Args:
+        history: Historical price data
+        timeframe: Time period for scaling ('1D', '7D', '30D')
+    
+    Returns:
+        Tuple of (momentum, volatility_pct)
+    """
     series = pd.Series(history, dtype=float).replace([np.inf, -np.inf], np.nan).dropna()
     returns = series.pct_change().replace([np.inf, -np.inf], np.nan).dropna()
     if returns.empty:
         return 0.0, 0.0
 
-    tail = returns.tail(30)
-    short = returns.tail(7)
+    tail = returns.tail(RETURN_SIGNAL_TAIL_DAYS)
+    short = returns.tail(RETURN_SIGNAL_SHORT_DAYS)
     volatility = float(tail.std()) if len(tail) > 1 else 0.0
-    momentum = float(short.ewm(span=min(5, len(short)), adjust=False).mean().iloc[-1])
-    scale = TIMEFRAME_SCALE.get(timeframe, 1.0)
+    momentum = float(short.ewm(span=min(RETURN_SIGNAL_EWM_SPAN, len(short)), adjust=False).mean().iloc[-1])
+    scale = CALIBRATION_TIMEFRAME_SCALE.get(timeframe, 1.0)
     return momentum * scale, volatility * 100
 
 
 def _dynamic_cap(volatility_pct: float, timeframe: str = "1D") -> float:
-    scale = TIMEFRAME_SCALE.get(timeframe, 1.0)
-    vol_cap = max(0.0015, (volatility_pct / 100) * 1.35 * scale)
-    return min(MAX_RETURN, vol_cap)
+    """Calculate dynamic cap based on volatility.
+    
+    Args:
+        volatility_pct: Volatility percentage
+        timeframe: Time period
+    
+    Returns:
+        Capped return value
+    """
+    scale = CALIBRATION_TIMEFRAME_SCALE.get(timeframe, 1.0)
+    vol_cap = max(DYNAMIC_CAP_MIN_VOL, (volatility_pct / 100) * DYNAMIC_CAP_VOL_MULTIPLIER * scale)
+    return min(CALIBRATION_MAX_RETURN, vol_cap)
 
 
 def detect_regime(volatility_pct: float) -> dict:
-    if volatility_pct >= 1.0:
-        return {"label": "High volatility", "aggressiveness": 0.55}
-    if volatility_pct >= 0.5:
-        return {"label": "Elevated volatility", "aggressiveness": 0.75}
-    return {"label": "Normal volatility", "aggressiveness": 1.0}
+    """Detect market regime based on volatility.
+    
+    Args:
+        volatility_pct: Volatility percentage
+    
+    Returns:
+        Dict with regime label and aggressiveness factor
+    """
+    if volatility_pct >= DYNAMIC_CAP_VOL_THRESHOLD["high"]:
+        return {"label": "High volatility", "aggressiveness": DYNAMIC_CAP_AGGRESSIVENESS["high"]}
+    if volatility_pct >= DYNAMIC_CAP_VOL_THRESHOLD["elevated"]:
+        return {"label": "Elevated volatility", "aggressiveness": DYNAMIC_CAP_AGGRESSIVENESS["elevated"]}
+    return {"label": "Normal volatility", "aggressiveness": DYNAMIC_CAP_AGGRESSIVENESS["normal"]}
 
 
 def calibrate_next_prediction(
@@ -65,7 +104,7 @@ def calibrate_next_prediction(
             "return_pct": 0.0,
             "raw_return_pct": 0.0,
             "adjusted_return_pct": 0.0,
-            "cap_pct": MAX_RETURN * 100,
+            "cap_pct": CALIBRATION_MAX_RETURN * 100,
             "volatility_pct": 0.0,
         }
 
@@ -76,11 +115,11 @@ def calibrate_next_prediction(
 
     clipped_model = float(np.clip(raw_return, -cap, cap))
     clipped_momentum = float(np.clip(momentum, -cap, cap))
-    blended_return = (0.68 * clipped_model) + (0.32 * clipped_momentum)
+    blended_return = (PREDICTION_BLEND_WEIGHTS["model"] * clipped_model) + (PREDICTION_BLEND_WEIGHTS["momentum"] * clipped_momentum)
     bounded_return = float(np.clip(blended_return * regime["aggressiveness"], -cap, cap))
 
     bounded_pred = float(reference_price) * (1 + bounded_return)
-    final_pred = (1 - SMOOTH_WEIGHT) * float(reference_price) + SMOOTH_WEIGHT * bounded_pred
+    final_pred = (1 - CALIBRATION_SMOOTH_WEIGHT) * float(reference_price) + CALIBRATION_SMOOTH_WEIGHT * bounded_pred
     final_return = pct_change(final_pred, float(reference_price))
 
     return {

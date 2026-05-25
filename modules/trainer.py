@@ -7,7 +7,18 @@ import sys
 import numpy as np
 import pandas as pd
 
-from modules.config import BATCH_SIZE, DATA_PATH, TRAIN_EPOCHS, WINDOW
+from modules.config import (
+    BATCH_SIZE,
+    DATA_PATH,
+    TRAIN_EPOCHS,
+    WINDOW,
+    RF_N_ESTIMATORS,
+    RF_MAX_DEPTH,
+    RF_MIN_SAMPLES_LEAF,
+    XGB_N_ESTIMATORS,
+    XGB_MAX_DEPTH,
+    XGB_LEARNING_RATE,
+)
 from modules.currency_registry import CURRENCY_COLUMNS
 from modules.data_pipeline import (
     inverse_target,
@@ -63,7 +74,7 @@ def build_training_bundle(currency_column: str, epochs: int = TRAIN_EPOCHS, use_
         data["y_train"],
         epochs=epochs,
         batch_size=BATCH_SIZE,
-        verbose=0,
+        verbose=False,
         shuffle=False,
         **fit_kwargs,
     )
@@ -72,11 +83,11 @@ def build_training_bundle(currency_column: str, epochs: int = TRAIN_EPOCHS, use_
     X_train_features = data["X_train"][:, -1, :]  # Last timestep features
     X_test_features = data["X_test"][:, -1, :] if len(data["X_test"]) else np.empty((0, X_train_features.shape[1]))
     
-    rf_model = build_random_forest_model(n_estimators=200, max_depth=8, min_samples_leaf=5)
+    rf_model = build_random_forest_model(n_estimators=RF_N_ESTIMATORS, max_depth=RF_MAX_DEPTH, min_samples_leaf=RF_MIN_SAMPLES_LEAF)
     rf_model.fit(X_train_features, data["y_train"].reshape(-1))
     
     # Train XGBoost
-    xgb_model = build_xgboost_model(n_estimators=100, max_depth=6, learning_rate=0.1)
+    xgb_model = build_xgboost_model(n_estimators=XGB_N_ESTIMATORS, max_depth=XGB_MAX_DEPTH, learning_rate=XGB_LEARNING_RATE)
     xgb_model.fit(X_train_features, data["y_train"].reshape(-1))
     
     # Validate ensemble using TimeSeriesSplit
@@ -86,8 +97,8 @@ def build_training_bundle(currency_column: str, epochs: int = TRAIN_EPOCHS, use_
         data["X_train"],
         data["y_train"],
         bilstm_model=bilstm,
-        rf_params={"n_estimators": 200, "max_depth": 8, "min_samples_leaf": 5},
-        xgb_params={"n_estimators": 100, "max_depth": 6, "learning_rate": 0.1},
+        rf_params={"n_estimators": RF_N_ESTIMATORS, "max_depth": RF_MAX_DEPTH, "min_samples_leaf": RF_MIN_SAMPLES_LEAF},
+        xgb_params={"n_estimators": XGB_N_ESTIMATORS, "max_depth": XGB_MAX_DEPTH, "learning_rate": XGB_LEARNING_RATE},
     )
     
     # Create ensemble

@@ -79,7 +79,7 @@ def _ensemble_scaled_prediction(model, artifacts: dict, X):
     Returns:
         Ensemble predictions
     """
-    lstm_scaled = model.predict(X, verbose=0)
+    lstm_scaled = model.predict(X, verbose=False)
     rf_model = artifacts.get("rf_model")
     xgb_model = artifacts.get("xgb_model")
     

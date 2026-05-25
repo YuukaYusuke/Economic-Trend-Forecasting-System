@@ -118,11 +118,11 @@ SESSION_KEYS = {
 # PREDICTION SETTINGS
 # ============================================================================
 
-# Confidence level thresholds
+# Confidence level thresholds (for prediction_confidence function)
 CONFIDENCE_THRESHOLDS = {
-    "high": 0.75,
-    "medium": 0.60,
-    "low": 0.45,
+    "strong": 1.5,    # >= 1.5% difference
+    "medium": 0.4,    # >= 0.4% difference
+    "weak": 0.0,      # < 0.4% difference
 }
 
 # Volatility thresholds (for risk levels)
@@ -133,10 +133,37 @@ VOLATILITY_THRESHOLDS = {
     "extreme": 0.10,  # > 10% volatility
 }
 
-# Forecast calibration settings
-CALIBRATION_SETTINGS = {
-    "cap_pct": 2.5,  # Cap prediction changes at 2.5%
-    "smooth_factor": 0.7,  # Smoothing for calibration
+# Forecast calibration settings (from forecast_calibration.py)
+CALIBRATION_MAX_RETURN = 0.015        # Max allowed return cap (1.5%)
+CALIBRATION_SMOOTH_WEIGHT = 0.2       # Smoothing weight for final prediction
+CALIBRATION_TIMEFRAME_SCALE = {       # Timeframe volatility scaling
+    "1D": 1.0,
+    "7D": 1.8,
+    "30D": 2.6,
+}
+
+# Model prediction blending weights
+PREDICTION_BLEND_WEIGHTS = {
+    "model": 0.68,          # Model prediction weight
+    "momentum": 0.32,       # Momentum historical weight
+}
+
+# Recent return signal parameters
+RETURN_SIGNAL_TAIL_DAYS = 30          # Look-back days for volatility
+RETURN_SIGNAL_SHORT_DAYS = 7          # Look-back days for momentum
+RETURN_SIGNAL_EWM_SPAN = 5            # Exponential weighted mean span
+
+# Dynamic cap parameters
+DYNAMIC_CAP_MIN_VOL = 0.0015          # Minimum volatility cap
+DYNAMIC_CAP_VOL_MULTIPLIER = 1.35     # Volatility multiplier for cap
+DYNAMIC_CAP_VOL_THRESHOLD = {
+    "high": 1.0,                       # High volatility threshold
+    "elevated": 0.5,                   # Elevated volatility threshold
+}
+DYNAMIC_CAP_AGGRESSIVENESS = {        # Regime aggressiveness factors
+    "high": 0.55,
+    "elevated": 0.75,
+    "normal": 1.0,
 }
 
 
