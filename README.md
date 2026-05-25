@@ -12,7 +12,7 @@
 
 *Prediksi tren nilai tukar mata uang global dengan akurasi tinggi menggunakan LSTM neural networks dan ensemble learning*
 
-[🔗 Live Demo](#-quick-start) • [📖 Documentation](#-dokumentasi) • [🐛 Issues](#-kontribusi) • [⭐ Star](#)
+[🔗 Live Demo](#https://economic-trend-forecasting-system-version-1.streamlit.app/) • [📖 Documentation](#-dokumentasi) • [🐛 Issues](#-kontribusi) • [⭐ Star](#)
 
 ---
 
