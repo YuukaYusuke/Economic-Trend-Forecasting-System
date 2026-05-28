@@ -37,10 +37,10 @@
 
 ---
 
-## 🛠️ Instalasi Lokal
+## 👥 Anggota Kelompok
 
-```bash
-cd "Economic Trend Forecasting System"
-python -m venv venv
-venv\Scripts\activate      # Windows
-pip install -r requirements.txt
+| No |    Nama    |    NIM     |
+|----|------------|------------|
+| 1  | japir      | 2313010530 |
+| 2  | nino       | 23130106 |
+| 3  | oktabian   | 2313010624 |
