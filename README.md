@@ -44,3 +44,6 @@
 | 1  | japir      | 2313010530 |
 | 2  | nino       | 23130106 |
 | 3  | oktabian   | 2313010624 |
+
+## Dataset kaggle
+https://www.kaggle.com/datasets/robikscube/exhange-rates-to-usd-from-imforg-updated-daily
